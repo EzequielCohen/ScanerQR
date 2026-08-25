@@ -1,0 +1,2 @@
+# ScanerQR
+ScanerQR
