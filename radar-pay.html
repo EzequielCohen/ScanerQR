@@ -418,7 +418,7 @@
             const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const code = window.jsQR ? jsQR(img.data, img.width, img.height) : null;
             if(code){
-              onQrDetected();
+              onQrDetected(code.data);
               return;
             }
           }
@@ -434,15 +434,32 @@
     if(stream){ stream.getTracks().forEach(t => t.stop()); stream = null; }
   }
 
-  document.getElementById('simulateScanBtn').addEventListener('click', onQrDetected);
+  document.getElementById('simulateScanBtn').addEventListener('click', () => {
+    // Genera un QR de prueba: a veces trae un monto válido, a veces contenido random
+    const testValues = ['4500', '18750', '99000', 'https://comercio.demo/pago/8f2a', 'MP-QR-TICKET-3391', '250000'];
+    const fake = testValues[Math.floor(Math.random() * testValues.length)];
+    onQrDetected(fake);
+  });
 
-  function onQrDetected(){
+  function onQrDetected(qrText){
     stopCamera();
-    amount = 0;
-    amountInput.value = '0';
+
+    const digits = String(qrText || '').replace(/[^\d]/g, '');
+    const scannedValue = digits ? parseInt(digits, 10) : NaN;
+    const isValidAmount = Number.isFinite(scannedValue) && scannedValue > 0 && scannedValue <= 100000;
+
+    if(isValidAmount){
+      amount = scannedValue;
+      amountInput.value = fmt(amount);
+      announce('Código QR leído. Monto detectado: $' + fmt(amount) + '.');
+    } else {
+      amount = 0;
+      amountInput.value = '0';
+      announce('Código QR leído. Ingresá el monto a pagar.');
+    }
+
     availEcho.textContent = fmt(balance);
     showScreen(amountScreen);
-    announce('Código QR leído. Ingresá el monto a pagar.');
   }
 
   // ---- Amount screen ----
@@ -523,4 +540,3 @@
 </script>
 </body>
 </html>
-
