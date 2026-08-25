@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Pagos con QR — Pagos con QR</title>
+<title>Radar Pay — Pagos con QR</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jsqr/1.4.0/jsQR.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 <style>
   :root{
     --bg:#0A0E17;
@@ -401,6 +401,10 @@
     if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
       camError.style.display = 'block';
       return;
+    }
+    if(!window.jsQR){
+      camError.textContent = 'No se pudo cargar el lector de QR (revisá tu conexión a internet). Podés simular la lectura igual.';
+      camError.style.display = 'block';
     }
     navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
       .then(s => {
